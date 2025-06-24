@@ -1,0 +1,32 @@
+import { useROS } from './hooks/useROS';
+import RobotPanel from './components/RobotPanel';
+import './style.css'
+import RobotControls from './components/RobotControls';
+import MainUnitMovie from './components/MainUnitMovie';
+
+function App() {
+  const ros = useROS();
+  const robots = ['orca_00', 'orca_01', 'orca_02'];
+
+  return (
+    <div id="wrapper">
+      <div id="controll-block">
+        <MainUnitMovie/>
+      </div>
+
+      <div id="camera-block">
+        {robots.map(robot => (
+          <RobotPanel key={robot} robotName={robot} ros={ros} />
+        ))}
+      </div>
+
+      <div id="robot-control">
+        {robots.map(robot => (
+          <RobotControls key={robot} robotName={robot} ros={ros} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default App;

@@ -1,0 +1,23 @@
+.wrapper{
+    display: flex;
+    padding: 20px 0px;
+}
+
+.button-list{
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    background-color: white;
+    padding: 30px 10px;
+    width: 200px;
+    height: 200px;
+}
+
+.posctl-buttonlist{
+    display: flex;
+    gap: 40px;
+}
+
+.show-rad{
+    margin: auto;
+}
