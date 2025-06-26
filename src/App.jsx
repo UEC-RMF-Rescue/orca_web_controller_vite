@@ -3,15 +3,17 @@ import RobotPanel from './components/RobotPanel';
 import './style.css'
 import RobotControls from './components/RobotControls';
 import MainUnitMovie from './components/MainUnitMovie';
+import { useState } from 'react';
 
 function App() {
   const ros = useROS();
   const robots = ['orca_00', 'orca_01', 'orca_02'];
+  const [activeRobotName, setActiveRobotName] = useState(null)
 
   return (
     <div id="wrapper">
       <div id="controll-block">
-        <MainUnitMovie ros={ros}/>
+        <MainUnitMovie ros={ros} activeRobotName={activeRobotName} setActiveRobotName={setActiveRobotName}/>
       </div>
 
       <div id="camera-block">
@@ -22,7 +24,7 @@ function App() {
 
       <div id="robot-control">
         {robots.map(robot => (
-          <RobotControls key={robot} robotName={robot} ros={ros} />
+          <RobotControls key={robot} robotName={robot} ros={ros} activeRobotName={activeRobotName} setActiveRobotName={setActiveRobotName}/>
         ))}
       </div>
     </div>

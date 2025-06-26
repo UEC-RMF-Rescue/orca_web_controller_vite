@@ -21,3 +21,8 @@
 .show-rad{
     margin: auto;
 }
+
+.active-robot {
+  border: 2px solid limegreen;
+  background-color: #f0fff0;
+}

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import ROSLIB from 'roslib';
 import '../styles/RobotControls.css';
 
-export default function RobotControls({ robotName, ros }) {
+export default function RobotControls({ robotName, ros, activeRobotName, setActiveRobotName }) {
   const [yawOffset, setYawOffset] = useState(null);
 
   useEffect(() => {
@@ -36,29 +36,39 @@ export default function RobotControls({ robotName, ros }) {
     });
   };
 
+  const isActive = activeRobotName === robotName;
+
   return (
-    <div className='wrapper'>
+    <div className={`wrapper ${isActive ? 'active-robot' : ''}`}>
       <div className='button-list'>
         <div className='posctl-buttonlist'>
+          {/* ① MainUnitMovieに対象を通知 */}
           <img
             src="../../public/target32.jpeg"
             alt="target"
             className='icon-button'
-            onClick={() => console.log(`Select ${robotName} for marker input`)}
+            onClick={() => setActiveRobotName(robotName)}
+            title="マーカー対象に選択"
           />
+          {/* ② execute_posctl */}
           <img
             src="../../public/start32.jpeg"
             alt="start"
             className='icon-button'
             onClick={() => callService('execute_posctl')}
+            title="execute_posctl"
           />
+          {/* ③ terminate_posctl */}
           <img
             src="../../public/trash32.jpeg"
             alt="stop"
             className='icon-button'
             onClick={() => callService('terminate_posctl')}
+            title="terminate_posctl"
           />
         </div>
+
+        {/* ④ yaw_rad_offset 表示 */}
         <div className='show-rad'>
           <p>{yawOffset !== null ? `deg: ${yawOffset}` : 'deg: --'}</p>
         </div>
