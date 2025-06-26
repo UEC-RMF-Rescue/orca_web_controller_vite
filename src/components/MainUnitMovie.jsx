@@ -12,7 +12,7 @@ export default function MainUnitMovie({ ros }) {
   // goal_input トピック（ros が ready の時だけ作成）
   const goalInputTopic = ros && new ROSLIB.Topic({
     ros: ros,
-    name: '/orca00/goal_input',
+    name: '/orca_00/goal_input',
     messageType: 'std_msgs/msg/Float64MultiArray'
   });
 
@@ -56,7 +56,7 @@ export default function MainUnitMovie({ ros }) {
         data: [x_m, y_m, yaw_rad]
       });
       goalInputTopic.publish(msg);
-      console.log('📤 Published to /orca00/goal_input:', msg.data);
+      console.log('📤 Published to /orca_00/goal_input:', msg.data);
     }
   };
 

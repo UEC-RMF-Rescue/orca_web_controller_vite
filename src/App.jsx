@@ -11,7 +11,7 @@ function App() {
   return (
     <div id="wrapper">
       <div id="controll-block">
-        <MainUnitMovie/>
+        <MainUnitMovie ros={ros}/>
       </div>
 
       <div id="camera-block">
