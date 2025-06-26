@@ -8,12 +8,24 @@ import { useState } from 'react';
 function App() {
   const ros = useROS();
   const robots = ['orca_00', 'orca_01', 'orca_02'];
-  const [activeRobotName, setActiveRobotName] = useState(null)
+  const [activeRobotName, setActiveRobotName] = useState(null);
+  const [yawInputs, setYawInputs] = useState({});
+
+  const updateYawInput = (robotName, yawStr) => {
+    setYawInputs(prev => ({
+      ...prev,
+      [robotName]: parseFloat(yawStr)
+    }));
+  };
 
   return (
     <div id="wrapper">
       <div id="controll-block">
-        <MainUnitMovie ros={ros} activeRobotName={activeRobotName} setActiveRobotName={setActiveRobotName}/>
+        <MainUnitMovie
+          ros={ros}
+          activeRobotName={activeRobotName}
+          yawInputs={yawInputs}
+        />
       </div>
 
       <div id="camera-block">
@@ -24,7 +36,15 @@ function App() {
 
       <div id="robot-control">
         {robots.map(robot => (
-          <RobotControls key={robot} robotName={robot} ros={ros} activeRobotName={activeRobotName} setActiveRobotName={setActiveRobotName}/>
+          <RobotControls
+            key={robot}
+            robotName={robot}
+            ros={ros}
+            activeRobotName={activeRobotName}
+            setActiveRobotName={setActiveRobotName}
+            yawInput={yawInputs[robot] || ''}
+            onYawInputChange={updateYawInput}
+          />
         ))}
       </div>
     </div>

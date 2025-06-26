@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import ROSLIB from 'roslib';
 import '../styles/MainUnitMovie.css';
 
-export default function MainUnitMovie({ ros, activeRobotName }) {
+export default function MainUnitMovie({ ros, activeRobotName, yawInputs }) {
   const videoRef = useRef(null);
   const coordAreaRef = useRef(null);
   const [coords, setCoords] = useState({ x: 0, y: 0 });
@@ -41,10 +41,15 @@ export default function MainUnitMovie({ ros, activeRobotName }) {
       const scaleX = rect.width;
       const scaleY = rect.height;
 
+      const markerColor =
+        activeRobotName === 'orca_00' ? 'yellow' :
+        activeRobotName === 'orca_01' ? 'hotpink' :
+        activeRobotName === 'orca_02' ? 'cyan' : 'red';
+
       const newMarkers = msg.poses.map(pose => {
         const x_px = originY - pose.position.x * scaleY;
-        const y_px = pose.position.y * scaleX + originX;
-        return { x: y_px, y: x_px };
+        const y_px = originX - pose.position.y * scaleX;
+        return { x: y_px, y: x_px, color: markerColor };
       });
 
       setGoalMarkers(newMarkers);
@@ -70,9 +75,8 @@ export default function MainUnitMovie({ ros, activeRobotName }) {
 
     const x_m = (originY - clickY) * scaleY;
     const y_m = (originX - clickX) * scaleX;
-    const yaw_rad = 0.0;
+    const yaw_rad = yawInputs?.[activeRobotName] ?? 0.0; // ← 入力欄の値を使う
 
-    // 色判定
     const markerColor =
       activeRobotName === 'orca_00' ? 'yellow' :
       activeRobotName === 'orca_01' ? 'hotpink' :
@@ -122,6 +126,7 @@ export default function MainUnitMovie({ ros, activeRobotName }) {
       <div className="coords-display">
         座標: (x, y) = ({coords.x}, {coords.y})
       </div>
+      <video ref={coordAreaRef}></video>
     </div>
   );
 }

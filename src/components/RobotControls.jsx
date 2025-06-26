@@ -2,25 +2,20 @@ import { useEffect, useState } from 'react';
 import ROSLIB from 'roslib';
 import '../styles/RobotControls.css';
 
-export default function RobotControls({ robotName, ros, activeRobotName, setActiveRobotName }) {
+export default function RobotControls({ robotName, ros, activeRobotName, setActiveRobotName, yawInput, onYawInputChange }) {
   const [yawOffset, setYawOffset] = useState(null);
 
   useEffect(() => {
     if (!ros || !robotName) return;
-
     const topic = new ROSLIB.Topic({
       ros,
       name: `/${robotName}/yaw_rad_offset`,
       messageType: 'std_msgs/Float64'
     });
-
     topic.subscribe((message) => {
       setYawOffset(message.data.toFixed(2));
     });
-
-    return () => {
-      topic.unsubscribe();
-    };
+    return () => topic.unsubscribe();
   }, [ros, robotName]);
 
   const callService = (serviceName) => {
@@ -29,9 +24,7 @@ export default function RobotControls({ robotName, ros, activeRobotName, setActi
       name: `/${robotName}/${serviceName}`,
       serviceType: 'std_srvs/Empty'
     });
-
-    const request = new ROSLIB.ServiceRequest();
-    service.callService(request, () => {
+    service.callService(new ROSLIB.ServiceRequest(), () => {
       console.log(`${serviceName} called for ${robotName}`);
     });
   };
@@ -42,35 +35,20 @@ export default function RobotControls({ robotName, ros, activeRobotName, setActi
     <div className={`wrapper ${isActive ? 'active-robot' : ''}`}>
       <div className='button-list'>
         <div className='posctl-buttonlist'>
-          {/* ① MainUnitMovieに対象を通知 */}
-          <img
-            src="../../public/target32.jpeg"
-            alt="target"
-            className='icon-button'
-            onClick={() => setActiveRobotName(robotName)}
-            title="マーカー対象に選択"
-          />
-          {/* ② execute_posctl */}
-          <img
-            src="../../public/start32.jpeg"
-            alt="start"
-            className='icon-button'
-            onClick={() => callService('execute_posctl')}
-            title="execute_posctl"
-          />
-          {/* ③ terminate_posctl */}
-          <img
-            src="../../public/trash32.jpeg"
-            alt="stop"
-            className='icon-button'
-            onClick={() => callService('terminate_posctl')}
-            title="terminate_posctl"
-          />
+          <img src="../../public/target32.jpeg" className='icon-button' onClick={() => setActiveRobotName(robotName)} />
+          <img src="../../public/start32.jpeg" className='icon-button' onClick={() => callService('execute_posctl')} />
+          <img src="../../public/trash32.jpeg" className='icon-button' onClick={() => callService('terminate_posctl')} />
         </div>
 
-        {/* ④ yaw_rad_offset 表示 */}
         <div className='show-rad'>
-          <p>{yawOffset !== null ? `deg: ${yawOffset}` : 'deg: --'}</p>
+            <input
+            type="number"
+            step="0.01"
+            className="yaw-input"
+            placeholder="yaw[rad]"
+            value={yawInput}
+            onChange={(e) => onYawInputChange(robotName, e.target.value)}
+            />
         </div>
       </div>
     </div>
