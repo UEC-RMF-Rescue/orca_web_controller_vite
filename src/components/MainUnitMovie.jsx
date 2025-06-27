@@ -41,10 +41,16 @@ export default function MainUnitMovie({ ros, activeRobotName }) {
       const scaleX = rect.width;
       const scaleY = rect.height;
 
+      // 色判定
+      const markerColor =
+        activeRobotName === 'orca_00' ? 'yellow' :
+        activeRobotName === 'orca_01' ? 'hotpink' :
+        activeRobotName === 'orca_02' ? 'cyan' : 'red';
+
       const newMarkers = msg.poses.map(pose => {
         const x_px = originY - pose.position.x * scaleY;
-        const y_px = pose.position.y * scaleX + originX;
-        return { x: y_px, y: x_px };
+        const y_px = originX - pose.position.y * scaleX;
+        return { x: y_px, y: x_px, color: markerColor };
       });
 
       setGoalMarkers(newMarkers);
@@ -115,7 +121,11 @@ export default function MainUnitMovie({ ros, activeRobotName }) {
           <div
             key={`goal-${i}`}
             className="marker goal"
-            style={{ left: `${m.x}px`, top: `${m.y}px` }}
+            style={{
+              left: `${m.x}px`,
+              top: `${m.y}px`,
+              backgroundColor: m.color  // 追加！
+            }}
           />
         ))}
       </div>

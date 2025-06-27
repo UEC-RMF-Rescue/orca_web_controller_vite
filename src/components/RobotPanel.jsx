@@ -1,13 +1,13 @@
 import { useEffect, useState, useRef } from 'react';
 import ROSLIB from 'roslib';
-import '../style.css'
+import '../style.css';
 
 export default function RobotPanel({ robotName, ros }) {
   const [isEnabled, setIsEnabled] = useState(false);
   const [mode, setMode] = useState('auto');
   const videoRef = useRef(null);
 
-  // ros が ready になるまで何もしない
+  // enabled_state購読
   useEffect(() => {
     if (!ros) return;
 
@@ -22,8 +22,9 @@ export default function RobotPanel({ robotName, ros }) {
     });
 
     return () => enabledStateSub.unsubscribe();
-  }, [ros, robotName]);  // ← robotName が変わっても更新するため依存配列に入れる
+  }, [ros, robotName]);
 
+  // カメラ起動
   useEffect(() => {
     if (videoRef.current) {
       navigator.mediaDevices.getUserMedia({ video: true, audio: false })
@@ -36,7 +37,7 @@ export default function RobotPanel({ robotName, ros }) {
     }
   }, []);
 
-  // Services & Topic は ros が ready のときだけ作成する
+  // サービスとトピック（ROSがreadyなときだけ定義）
   const enableService = ros ? new ROSLIB.Service({
     ros,
     name: `/${robotName}/enable`,
@@ -61,6 +62,7 @@ export default function RobotPanel({ robotName, ros }) {
     messageType: 'std_msgs/Int32'
   }) : null;
 
+  // サービス呼び出し関数
   const callEnable = () => {
     if (!enableService) return;
     enableService.callService({}, () => {
@@ -71,7 +73,7 @@ export default function RobotPanel({ robotName, ros }) {
   const callDisable = () => {
     if (!disableService) return;
     disableService.callService({}, () => {
-      console.log(`${robotName} disable ✅`);
+      console.log(`${robotName} disable ❌`);
     });
   };
 
@@ -91,44 +93,48 @@ export default function RobotPanel({ robotName, ros }) {
 
   const toggleMode = (e) => {
     e.stopPropagation();
-    const newMode = (mode === 'auto') ? 'manual' : 'auto';
+    const newMode = mode === 'auto' ? 'manual' : 'auto';
     setMode(newMode);
     sendControlState(newMode === 'auto' ? 1 : 0);
   };
 
   return (
     <div className="camera-box">
-        <button
+      {/* Enable ボタン */}
+      <button
         onClick={callEnable}
         style={{
-            display: isEnabled ? 'none' : 'inline-block',
-            backgroundColor: 'rgba(46, 125, 228, 0.7)', // 青色
-            borderRadius: '5px',
-            padding: '10px 20px',
-            fontSize: '16px',
-            cursor: 'pointer'
+          backgroundColor: 'rgba(46, 125, 228, 0.7)',
+          borderRadius: '5px',
+          fontSize: '16px',
+          cursor: 'pointer',
+          marginRight: '10px',
+          padding: '10px 20px'
         }}
-        ></button>
+      >
+        Enable
+      </button>
 
-        <button
+      {/* Disable ボタン */}
+      <button
         onClick={callDisable}
         style={{
-            display: isEnabled ? 'inline-block' : 'none',
-            backgroundColor: 'rgba(255, 0, 0, 0.6)', // 赤色
-            borderRadius: '5px',
-            padding: '10px 20px',
-            fontSize: '16px',
-            cursor: 'pointer'
+          backgroundColor: 'rgba(255, 0, 0, 0.6)',
+          borderRadius: '5px',
+          fontSize: '16px',
+          cursor: 'pointer',
+          padding: '10px 20px'
         }}
-        ></button>
-
+      >
+        Disable
+      </button>
 
       <div className={`is-enable ${mode}`} onClick={toggleMode}>
         <video ref={videoRef} autoPlay muted />
         <div className="button-group">
-          <button onClick={(e) => { e.stopPropagation()}}>32do</button>
+          <button onClick={(e) => e.stopPropagation()}>32do</button>
           <button onClick={(e) => { e.stopPropagation(); callSetOffset(); }}>offset</button>
-          <button onClick={(e) => { e.stopPropagation()}}>arm</button>
+          <button onClick={(e) => e.stopPropagation()}>arm</button>
         </div>
       </div>
     </div>
