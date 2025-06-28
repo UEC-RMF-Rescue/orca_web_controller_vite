@@ -6,8 +6,7 @@ export default function MainUnitMovie({ ros, activeRobotName, yawOffsets }) {
   const videoRef = useRef(null);
   const coordAreaRef = useRef(null);
   const [coords, setCoords] = useState({ x: 0, y: 0 });
-  const [clickMarkers, setClickMarkers] = useState([]);
-  const [goalMarkers, setGoalMarkers] = useState([]);
+  const [goalMarkers, setGoalMarkers] = useState({}); // ← ロボット名ごとのマーカー保持
 
   // カメラ起動
   useEffect(() => {
@@ -22,7 +21,7 @@ export default function MainUnitMovie({ ros, activeRobotName, yawOffsets }) {
     }
   }, []);
 
-  // PoseArray受信してマーカー表示
+  // PoseArray受信してマーカー表示（ロボットごとに記録）
   useEffect(() => {
     if (!ros || !activeRobotName) return;
 
@@ -41,7 +40,6 @@ export default function MainUnitMovie({ ros, activeRobotName, yawOffsets }) {
       const scaleX = rect.width;
       const scaleY = rect.height;
 
-      // 色判定
       const markerColor =
         activeRobotName === 'orca_00' ? 'yellow' :
         activeRobotName === 'orca_01' ? 'hotpink' :
@@ -53,7 +51,10 @@ export default function MainUnitMovie({ ros, activeRobotName, yawOffsets }) {
         return { x: y_px, y: x_px, color: markerColor };
       });
 
-      setGoalMarkers(newMarkers);
+      setGoalMarkers(prev => ({
+        ...prev,
+        [activeRobotName]: newMarkers
+      }));
     };
 
     goalSub.subscribe(handler);
@@ -76,15 +77,10 @@ export default function MainUnitMovie({ ros, activeRobotName, yawOffsets }) {
 
     const x_m = (originY - clickY) * scaleY;
     const y_m = (originX - clickX) * scaleX;
-    const yaw_rad = yawOffsets?.[activeRobotName] ? parseFloat(yawOffsets[activeRobotName]) : 0.0;
+    const yaw_rad = yawOffsets?.[activeRobotName]
+      ? parseFloat(yawOffsets[activeRobotName])
+      : 0.0;
 
-    // 色判定
-    const markerColor =
-      activeRobotName === 'orca_00' ? 'yellow' :
-      activeRobotName === 'orca_01' ? 'hotpink' :
-      activeRobotName === 'orca_02' ? 'cyan' : 'red';
-
-    setClickMarkers(prev => [...prev, { x: clickX, y: clickY, color: markerColor }]);
     setCoords({ x: x_m.toFixed(3), y: y_m.toFixed(3) });
 
     const topic = new ROSLIB.Topic({
@@ -106,28 +102,21 @@ export default function MainUnitMovie({ ros, activeRobotName, yawOffsets }) {
         onClick={handleClick}
       >
         <video ref={videoRef} autoPlay muted playsInline />
-        {/*clickMarkers.map((m, i) => (
-          <div
-            key={`click-${i}`}
-            className="marker"
-            style={{
-              left: `${m.x}px`,
-              top: `${m.y}px`,
-              backgroundColor: m.color
-            }}
-          />
-        ))*/}
-        {goalMarkers.map((m, i) => (
-          <div
-            key={`goal-${i}`}
-            className="marker goal"
-            style={{
-              left: `${m.x}px`,
-              top: `${m.y}px`,
-              backgroundColor: m.color  // 追加！
-            }}
-          />
-        ))}
+
+        {/* 全ロボットのマーカーを描画 */}
+        {Object.entries(goalMarkers).flatMap(([robot, markers]) =>
+          markers.map((m, i) => (
+            <div
+              key={`goal-${robot}-${i}`}
+              className="marker goal"
+              style={{
+                left: `${m.x}px`,
+                top: `${m.y}px`,
+                backgroundColor: m.color
+              }}
+            />
+          ))
+        )}
       </div>
       <div className="coords-display">
         座標: (x, y) = ({coords.x}, {coords.y})
