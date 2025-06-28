@@ -26,7 +26,7 @@ export default function RobotControls({ robotName, ros, activeRobotName, setActi
     return () => {
         topic.unsubscribe();
     };
-    }, [ros, robotName]);
+    }, []);
 
   const callService = (serviceName) => {
     const service = new ROSLIB.Service({
