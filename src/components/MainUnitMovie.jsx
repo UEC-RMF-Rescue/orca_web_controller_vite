@@ -69,13 +69,13 @@ export default function MainUnitMovie({ ros, activeRobotName, yawOffsets }) {
     const clickX = event.clientX - rect.left;
     const clickY = event.clientY - rect.top;
 
-    const originX = rect.width / 2;
+    const originX = (rect.width / 2 );
     const originY = rect.height;
 
-    const scaleX = 1.0 / rect.width;
-    const scaleY = 1.0 / rect.height;
+    const scaleX = 2.0 / rect.width;
+    const scaleY = 2.0 / rect.height;
 
-    const x_m = (originY - clickY) * scaleY;
+    const x_m = (originY - clickY) * scaleY + 0.5;
     const y_m = (originX - clickX) * scaleX;
     const yaw_rad = yawOffsets?.[activeRobotName]
       ? parseFloat(yawOffsets[activeRobotName])

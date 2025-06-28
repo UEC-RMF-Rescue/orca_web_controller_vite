@@ -76,18 +76,19 @@ export default function RobotControls({ robotName, ros, activeRobotName, setActi
         {/* ④ yaw_rad_offset 表示 */}
         <div className='show-rad'>
             <input
-                type='number'
-                value={yawOffsets?.[robotName] ?? ''}
-                onChange={(e) => {
-                    const val = parseFloat(e.target.value);
-                    if (!isNaN(val)) {
-                    setYawOffsets(prev => ({
-                        ...prev,
-                        [robotName]: val.toFixed(2)
-                    }));
-                    }
-                }}
-                />
+            type='number'
+            step="0.01"
+            value={yawOffsets?.[robotName] ?? ''}
+            onChange={(e) => {
+                const val = e.target.value;
+
+                // 入力中の文字列をそのまま保持（小数点途中や空文字にも対応）
+                setYawOffsets(prev => ({
+                ...prev,
+                [robotName]: val
+                }));
+            }}
+            />
         </div>
       </div>
     </div>
