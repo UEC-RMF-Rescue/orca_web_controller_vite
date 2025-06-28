@@ -5,6 +5,7 @@ import '../style.css';
 export default function RobotPanel({ robotName, ros }) {
   const [isEnabled, setIsEnabled] = useState(false);
   const [mode, setMode] = useState('auto');
+  const [yawRadOffset, setYawRadOffset] = useState(null);
   const videoRef = useRef(null);
 
   // enabled_state購読
@@ -36,6 +37,23 @@ export default function RobotPanel({ robotName, ros }) {
         });
     }
   }, []);
+
+  //
+  useEffect(() => {
+    if (!ros) return;
+
+    const yawOffsetSub = new ROSLIB.Topic({
+      ros,
+      name: `/${robotName}/yaw_rad/offset`,
+      messageType: 'std_msgs/Float64'
+    });
+
+    yawOffsetSub.subscribe((msg) => {
+      setYawRadOffset(msg.data.toFixed(2));
+    });
+
+    return () => yawOffsetSub.unsubscribe();
+  }, [ros, robotName]);
 
   // サービスとトピック（ROSがreadyなときだけ定義）
   const enableService = ros ? new ROSLIB.Service({
@@ -130,9 +148,9 @@ export default function RobotPanel({ robotName, ros }) {
       <div className={`is-enable ${mode}`} onClick={toggleMode}>
         <video ref={videoRef} autoPlay muted />
         <div className="button-group">
-          <button onClick={(e) => e.stopPropagation()}>32do</button>
+          <button>{yawRadOffset !== null ? `${yawRadOffset} rad` : '--'}</button>
           <button onClick={(e) => { e.stopPropagation(); callSetOffset(); }}>offset</button>
-          <button onClick={(e) => e.stopPropagation()}>arm</button>
+          <button onClick={(e) => { e.stopPropagation() }}>arm</button>
         </div>
       </div>
     </div>
