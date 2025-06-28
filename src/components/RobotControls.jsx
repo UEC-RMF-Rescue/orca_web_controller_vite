@@ -15,7 +15,6 @@ export default function RobotControls({ robotName, ros, activeRobotName, setActi
 
     topic.subscribe((message) => {
         const val = message.data.toFixed(2);
-        setYawOffsets(val);
 
         // 状態をAppに伝える
         setYawOffsets(prev => ({
@@ -76,7 +75,19 @@ export default function RobotControls({ robotName, ros, activeRobotName, setActi
 
         {/* ④ yaw_rad_offset 表示 */}
         <div className='show-rad'>
-            <input type='number' onChange={(e) => setYawOffsets(e.target.value)}/>
+            <input
+                type='number'
+                value={yawOffsets?.[robotName] ?? ''}
+                onChange={(e) => {
+                    const val = parseFloat(e.target.value);
+                    if (!isNaN(val)) {
+                    setYawOffsets(prev => ({
+                        ...prev,
+                        [robotName]: val.toFixed(2)
+                    }));
+                    }
+                }}
+                />
         </div>
       </div>
     </div>

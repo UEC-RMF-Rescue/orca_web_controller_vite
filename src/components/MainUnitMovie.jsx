@@ -106,7 +106,7 @@ export default function MainUnitMovie({ ros, activeRobotName, yawOffsets }) {
         onClick={handleClick}
       >
         <video ref={videoRef} autoPlay muted playsInline />
-        {clickMarkers.map((m, i) => (
+        {/*clickMarkers.map((m, i) => (
           <div
             key={`click-${i}`}
             className="marker"
@@ -116,7 +116,7 @@ export default function MainUnitMovie({ ros, activeRobotName, yawOffsets }) {
               backgroundColor: m.color
             }}
           />
-        ))}
+        ))*/}
         {goalMarkers.map((m, i) => (
           <div
             key={`goal-${i}`}
