@@ -2,26 +2,32 @@ import { useEffect, useState } from 'react';
 import ROSLIB from 'roslib';
 import '../styles/RobotControls.css';
 
-export default function RobotControls({ robotName, ros, activeRobotName, setActiveRobotName }) {
-  const [yawOffset, setYawOffset] = useState(null);
+export default function RobotControls({ robotName, ros, activeRobotName, setActiveRobotName, yawOffsets ,setYawOffsets }) {
 
-  useEffect(() => {
+    useEffect(() => {
     if (!ros || !robotName) return;
 
     const topic = new ROSLIB.Topic({
-      ros,
-      name: `/${robotName}/yaw_rad_offset`,
-      messageType: 'std_msgs/Float64'
+        ros,
+        name: `/${robotName}/yaw_rad_offset`,
+        messageType: 'std_msgs/Float64'
     });
 
     topic.subscribe((message) => {
-      setYawOffset(message.data.toFixed(2));
+        const val = message.data.toFixed(2);
+        setYawOffsets(val);
+
+        // 状態をAppに伝える
+        setYawOffsets(prev => ({
+        ...prev,
+        [robotName]: val
+        }));
     });
 
     return () => {
-      topic.unsubscribe();
+        topic.unsubscribe();
     };
-  }, [ros, robotName]);
+    }, [ros, robotName]);
 
   const callService = (serviceName) => {
     const service = new ROSLIB.Service({
@@ -70,7 +76,7 @@ export default function RobotControls({ robotName, ros, activeRobotName, setActi
 
         {/* ④ yaw_rad_offset 表示 */}
         <div className='show-rad'>
-          <p>{yawOffset !== null ? `deg: ${yawOffset}` : 'deg: --'}</p>
+            <input type='number' onChange={(e) => setYawOffsets(e.target.value)}/>
         </div>
       </div>
     </div>

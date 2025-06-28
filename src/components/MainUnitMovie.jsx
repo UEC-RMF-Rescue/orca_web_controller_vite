@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import ROSLIB from 'roslib';
 import '../styles/MainUnitMovie.css';
 
-export default function MainUnitMovie({ ros, activeRobotName }) {
+export default function MainUnitMovie({ ros, activeRobotName, yawOffsets }) {
   const videoRef = useRef(null);
   const coordAreaRef = useRef(null);
   const [coords, setCoords] = useState({ x: 0, y: 0 });
@@ -76,7 +76,7 @@ export default function MainUnitMovie({ ros, activeRobotName }) {
 
     const x_m = (originY - clickY) * scaleY;
     const y_m = (originX - clickX) * scaleX;
-    const yaw_rad = 0.0;
+    const yaw_rad = yawOffsets?.[activeRobotName] ? parseFloat(yawOffsets[activeRobotName]) : 0.0;
 
     // 色判定
     const markerColor =
