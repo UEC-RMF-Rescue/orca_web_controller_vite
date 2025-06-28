@@ -112,7 +112,6 @@ export default function RobotPanel({ robotName, ros }) {
           padding: '10px 20px'
         }}
       >
-        Enable
       </button>
 
       {/* Disable ボタン */}
@@ -126,7 +125,6 @@ export default function RobotPanel({ robotName, ros }) {
           padding: '10px 20px'
         }}
       >
-        Disable
       </button>
 
       <div className={`is-enable ${mode}`} onClick={toggleMode}>
