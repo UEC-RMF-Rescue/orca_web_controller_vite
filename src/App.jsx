@@ -4,6 +4,7 @@ import './style.css'
 import RobotControls from './components/RobotControls';
 import MainUnitMovie from './components/MainUnitMovie';
 import { useState } from 'react';
+import ORCAUnitPosition from './components/ORCAUnitPosition';
 
 function App() {
   const ros = useROS();
@@ -20,6 +21,11 @@ function App() {
           setActiveRobotName={setActiveRobotName}
           yawOffsets={yawOffsets}
         />
+      <div style={{ display: 'flex', flexDirection: 'row' }}>
+        {robots.map(robot => (
+          <ORCAUnitPosition key={robot} robotName={robot} ros={ros} />
+        ))}
+      </div>
       </div>
 
       <div id="camera-block">
